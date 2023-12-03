@@ -17,6 +17,7 @@ type ServerInterface interface {
 	Create(url string, payload interface{}) error
 	Update(url string) error
 	Delete(url string) error
+	Stop(url string) error
 }
 
 func NewServerService(token string) ServerInterface {
@@ -49,7 +50,7 @@ func (server *ServerService) Delete(regionCode, serverInstanceNo, url string) er
 	)
 	
 	// httpRequest 생성
-	request, err := http.NewRequest(http.MethodDelete, url, nil)
+	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return fmt.Errorf("Error creating request: ", err)
 	}
@@ -74,5 +75,44 @@ func (server *ServerService) Delete(regionCode, serverInstanceNo, url string) er
 		return fmt.Errorf("Unexpected response status code:", err)
 	}
 	
+	return nil
+}
+
+func (server *ServerService) Stop(regionCode, serverInstanceNo, url string) error {
+
+	url += fmt.Sprintf("?regionCode=%s&serverInstanceNoList.1=%d&responseFormatType=json",
+	 regionCode, serverInstanceNo,
+	)
+	
+	// httpRequest 생성
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return fmt.Errorf("Error creating request: ", err)
+	}
+	// httpRequest header 설정
+	GetCommonHeader(request)
+	
+	// httpRequest token 설정
+	SetAuthToken(request, server.token)
+
+	// HTTP 클라이언트 생성
+	client := &http.Client{}
+
+	// 요청 보내기
+	response, err := client.Do(request)
+	if err != nil {
+		return fmt.Errorf("Error sending request:", err)
+	}
+	defer response.Body.Close()
+	
+	// 결과 반환
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("Unexpected response status code:", err)
+	}
+	
+	return nil
+}
+
+func (server *ServerService) Update(url string) error {
 	return nil
 }
