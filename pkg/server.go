@@ -50,7 +50,7 @@ func (server *ServerService) Delete(regionCode, serverInstanceNo, url string) er
 	)
 	
 	// httpRequest 생성
-	request, err := http.NewRequest(http.MethodGet, url, nil)
+	request, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		return fmt.Errorf("Error creating request: ", err)
 	}
@@ -85,7 +85,7 @@ func (server *ServerService) Stop(regionCode, serverInstanceNo, url string) erro
 	)
 	
 	// httpRequest 생성
-	request, err := http.NewRequest(http.MethodGet, url, nil)
+	request, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		return fmt.Errorf("Error creating request: ", err)
 	}
