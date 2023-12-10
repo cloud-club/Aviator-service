@@ -1,20 +1,23 @@
 package pkg
 
 import (
+	"bytes"
 	"errors"
+	"net/http"
 )
 
 type ServerService struct {
-	token string
+	client *http.Client
+	token  string
 }
 
 //go:generate mockgen -destination=mocks/mock_server.go -package=mocks github.com/cloud-club/Aviator-service/pkg ServerInterface
 type ServerInterface interface {
-	Get(url string) error
-	List(url string) error
-	Create(url string, payload interface{}) error
-	Update(url string) error
-	Delete(url string) error
+	Get(url string) (*http.Response, error)
+	List(url string) (*http.Response, error)
+	Create(url string, payload []byte) (*http.Response, error)
+	Update(url string, payload []byte) (*http.Response, error)
+	Delete(url string) (*http.Response, error)
 }
 
 func NewServerService(token string) ServerInterface {
@@ -25,25 +28,37 @@ func (server *ServerService) GetToken() string {
 	return server.token
 }
 
-func (server *ServerService) Create(url string, payload interface{}) error {
-	return nil
+func (server *ServerService) Create(url string, payload []byte) (*http.Response, error) {
+	return server.do(http.MethodPost, url, payload)
 }
 
-func (server *ServerService) Get(url string) error {
-	return nil
+func (server *ServerService) Get(url string) (*http.Response, error) {
+	return server.do(http.MethodGet, url, nil)
 }
 
-func (server *ServerService) List(url string) error {
+func (server *ServerService) List(url string) (*http.Response, error) {
 	if len(url) == 0 {
-		return errors.New("please input url")
+		return nil, errors.New("please input url")
 	}
-	return nil
+	return nil, nil
+	//return server.do(http.MethodGet, url, nil)
 }
 
-func (server *ServerService) Delete(url string) error {
-	return nil
+func (server *ServerService) Delete(url string) (*http.Response, error) {
+	return server.do(http.MethodDelete, url, nil)
 }
 
-func (server *ServerService) Update(url string) error {
-	return nil
+func (server *ServerService) Update(url string, payload []byte) (*http.Response, error) {
+	return server.do(http.MethodPatch, url, payload)
+}
+
+func (server *ServerService) do(method string, url string, payload []byte) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, bytes.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+	GetCommonHeader(req)
+	SetAuthToken(req, server.token)
+
+	return server.client.Do(req)
 }

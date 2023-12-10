@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestList(t *testing.T) {
+func (suite *NcpSuite) TestList() {
 	ncp := pkg.NewNcpService("ncp service token")
 	ncp.Server = pkg.NewServerService("ncp server token")
 
@@ -25,7 +25,7 @@ func TestList(t *testing.T) {
 			expectedData:  nil,
 		},
 		{
-			name:          "(실패) url을 입력 안함",
+			name:          "(실패) url 입력 안함",
 			url:           "",
 			payload:       nil,
 			expectedError: "please input url",
@@ -34,18 +34,23 @@ func TestList(t *testing.T) {
 	}
 
 	for i := range tests {
-		t.Logf("%s : running scenario %d", tests[i].name, i)
-		t.Run(tests[i].name, func(t *testing.T) {
-			err := ncp.Server.List(tests[i].url)
+
+		suite.T().Logf("%s : running scenario %d", tests[i].name, i)
+		suite.T().Run(tests[i].name, func(t *testing.T) {
+			_, err := suite.ncp.Server.List(tests[i].url)
 			if err != nil {
-				if err.Error() != tests[i].expectedError {
-					t.Fatalf("expected error : %v, got : %v", tests[i].expectedError, err)
-				}
-			} else {
-				if tests[i].expectedError != "" {
-					t.Fatalf("expected error : %v, got : %v", tests[i].expectedError, err)
-				}
+				suite.Assert().Error(err, tests[i].expectedError)
 			}
+			//
+			//if err != nil {
+			//	if err.Error() != tests[i].expectedError {
+			//		t.Fatalf("expected error : %v, got : %v", tests[i].expectedError, err)
+			//	}
+			//} else {
+			//	if tests[i].expectedError != "" {
+			//		t.Fatalf("expected error : %v, got : %v", tests[i].expectedError, err)
+			//	}
+			//}
 		})
 	}
 
