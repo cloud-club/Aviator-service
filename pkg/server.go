@@ -2,26 +2,22 @@ package pkg
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 	"net/http"
 )
 
 type ServerService struct {
-	client *http.Client
-	token  string
+	client    *http.Client
+	Interface ServerInterface
+	token     string
 }
 
-//go:generate mockgen -destination=mocks/mock_server.go -package=mocks github.com/cloud-club/Aviator-service/pkg ServerInterface
 type ServerInterface interface {
 	Get(url string) (*http.Response, error)
 	List(url string) (*http.Response, error)
 	Create(url string, payload []byte) (*http.Response, error)
 	Update(url string, payload []byte) (*http.Response, error)
 	Delete(url string) (*http.Response, error)
-}
-
-func NewServerService(token string) ServerInterface {
-	return &ServerService{token: token}
 }
 
 func (server *ServerService) GetToken() string {
@@ -38,7 +34,7 @@ func (server *ServerService) Get(url string) (*http.Response, error) {
 
 func (server *ServerService) List(url string) (*http.Response, error) {
 	if len(url) == 0 {
-		return nil, errors.New("please input url")
+		return nil, fmt.Errorf("please input url")
 	}
 	return nil, nil
 	//return server.do(http.MethodGet, url, nil)

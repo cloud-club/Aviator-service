@@ -21,7 +21,6 @@ func TestNcpSuite(t *testing.T) {
 // This method gets run only first time before starting test
 func (suite *NcpSuite) SetupSuite() {
 	suite.ncp = pkg.NewNcpService("ncp service token")
-	suite.ncp.Server = pkg.NewServerService("ncp server token")
 
 	err := suite.ncp.CreateToken("admin", "CloudClubAdmin", []string{"admin"})
 	assert.NoError(suite.T(), err, nil)
