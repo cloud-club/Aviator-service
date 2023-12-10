@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"github.com/cloud-club/Aviator-service/types"
+	"time"
+)
 
 // ServerInstanceResponse is same as compute server in Naver Cloud (such as AWS EC2)
 type ServerInstanceResponse struct {
@@ -9,12 +12,12 @@ type ServerInstanceResponse struct {
 	ServerDescription              string
 	CpuCount                       int
 	MemorySize                     int64
-	PlatformType                   CommonCode
+	PlatformType                   types.CommonCode
 	LoginKeyName                   string
 	PublicIpInstanceNo             string
 	PublicIp                       string
-	ServerInstanceStatus           CommonCode
-	ServerInstanceOperation        CommonCode
+	ServerInstanceStatus           types.CommonCode
+	ServerInstanceOperation        types.CommonCode
 	ServerInstanceStatusName       string
 	CreateDate                     time.Time
 	Uptime                         time.Time
@@ -25,16 +28,16 @@ type ServerInstanceResponse struct {
 	RegionCode                     string
 	VpcNo                          string
 	SubnetNo                       string
-	NetworkInterfaceNoList         NetworkInterfaceNoList
+	NetworkInterfaceNoList         types.NetworkInterfaceNoList
 	InitScriptNo                   string
-	ServerInstanceType             CommonCode
-	BaseBlockStorageDiskType       CommonCode
-	BaseBlockStorageDiskDetailType CommonCode
+	ServerInstanceType             types.CommonCode
+	BaseBlockStorageDiskType       types.CommonCode
+	BaseBlockStorageDiskDetailType types.CommonCode
 	PlacementGroupNo               string
 	PlacementGroupName             string
 	MemberServerImageInstanceNo    string
-	BlockDevicePartitionList       []BlockDevicePartition
-	HypervisorType                 CommonCode
+	BlockDevicePartitionList       []types.BlockDevicePartition
+	HypervisorType                 types.CommonCode
 	ServerImageNo                  string
 	ServerSpecCode                 string
 }
