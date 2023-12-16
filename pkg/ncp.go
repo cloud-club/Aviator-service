@@ -5,6 +5,10 @@ import (
 	"github.com/cloud-club/Aviator-service/types/auth"
 	"github.com/dgrijalva/jwt-go/v4"
 	"time"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"strings"
 )
 
 const (
@@ -13,6 +17,8 @@ const (
 )
 
 type NcpService struct {
+	AccessKey string
+	SecretKey string
 	token  string
 	Server ServerInterface
 }
@@ -53,4 +59,16 @@ func (n *NcpService) VerifyToken(token string, claim *auth.AuthTokenClaims) (boo
 		return []byte(SignKey), nil
 	})
 	return t.Valid, err
+}
+
+func (n *NcpService) MakeSignature(timeStamp, method, url string) string {
+	message := strings.Join([]string{method, " ", url, "\n", timeStamp, "\n", n.AccessKey}, "")
+
+	signingKey := hmac.New(sha256.New, []byte(n.SecretKey))
+	signingKey.Write([]byte(message))
+
+	rawHmac := signingKey.Sum(nil)
+	encodeBase64String := base64.StdEncoding.EncodeToString(rawHmac)
+
+	return encodeBase64String
 }
