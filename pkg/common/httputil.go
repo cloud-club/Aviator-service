@@ -49,11 +49,17 @@ func (h *HttpService) Update(url string, payload []byte) (*http.Response, error)
 }
 
 func (h *HttpService) do(method string, url string, payload []byte) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, bytes.NewReader(payload))
-	if err != nil {
-		return nil, err
+	var req *http.Request
+	var err error
+	if method == http.MethodGet {
+		if req, err = http.NewRequest(method, url, nil); err != nil {
+			return nil, err
+		}
+	} else {
+		if req, err = http.NewRequest(method, url, bytes.NewReader(payload)); err != nil {
+			return nil, err
+		}
 	}
-	GetCommonHeader(req)
 
 	return h.Client.Do(req)
 }

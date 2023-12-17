@@ -3,13 +3,14 @@ package pkg
 import (
 	"bytes"
 	"fmt"
+	"github.com/cloud-club/Aviator-service/pkg/common"
 	"net/http"
 )
 
 type ServerService struct {
-	client    *http.Client
-	Interface ServerInterface
-	token     string
+	Interface   ServerInterface
+	HttpService common.HttpService
+	token       string
 }
 
 type ServerInterface interface {
@@ -20,8 +21,8 @@ type ServerInterface interface {
 	Delete(url string) (*http.Response, error)
 }
 
-func (server *ServerService) GetToken() string {
-	return server.token
+func Init(i ServerInterface) ServerService {
+	return ServerService{Interface: i}
 }
 
 func (server *ServerService) Create(url string, payload []byte) (*http.Response, error) {
@@ -36,8 +37,8 @@ func (server *ServerService) List(url string) (*http.Response, error) {
 	if len(url) == 0 {
 		return nil, fmt.Errorf("please input url")
 	}
-	return nil, nil
-	//return server.do(http.MethodGet, url, nil)
+	//return nil, nil
+	return server.do(http.MethodGet, url, nil)
 }
 
 func (server *ServerService) Delete(url string) (*http.Response, error) {
@@ -53,8 +54,7 @@ func (server *ServerService) do(method string, url string, payload []byte) (*htt
 	if err != nil {
 		return nil, err
 	}
-	GetCommonHeader(req)
-	SetAuthToken(req, server.token)
+	common.GetCommonHeader(req)
 
-	return server.client.Do(req)
+	return server.HttpService.Client.Do(req)
 }

@@ -2,12 +2,12 @@ package pkg_test
 
 import (
 	"fmt"
-	"github.com/cloud-club/Aviator-service/pkg"
+	pkg2 "github.com/cloud-club/Aviator-service/pkg/mocks"
 	"testing"
 )
 
 func (suite *NcpSuite) TestList() {
-	mockInterface := &pkg.MockServerInterface{}
+	mockInterface := &pkg2.MockServerInterface{}
 
 	// given
 	tests := []struct {
@@ -42,17 +42,24 @@ func (suite *NcpSuite) TestList() {
 		suite.T().Run(tests[i].name, func(t *testing.T) {
 			suite.T().Logf("%s : running scenario %d", tests[i].name, i)
 
-			mockInterface.On("List", tests[i].url).
-				Return(nil, fmt.Errorf("%v", tests[i].actualError)).
-				Once()
+			if tests[i].actualError == "" {
+				mockInterface.On("List", tests[i].url).
+					Return(nil, nil).
+					Once()
 
+			} else {
+				mockInterface.On("List", tests[i].url).
+					Return(nil, fmt.Errorf("%s", tests[i].actualError)).
+					Once()
+			}
 			suite.ncp.Server.Interface = mockInterface
 
 			_, err := suite.ncp.Server.Interface.List(tests[i].url)
-			if err.Error() != "" {
+			if err != nil {
 				suite.Assert().EqualError(err, tests[i].expectedError)
+			} else {
+				suite.Assert().NoError(err)
 			}
-
 		})
 	}
 
